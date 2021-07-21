@@ -1,4 +1,5 @@
 import socketserver
+import datetime
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
     """
@@ -9,13 +10,15 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
     """
 
     def handle(self):
+        now = datetime.datetime.now().isoformat()
         data = self.request[0].strip()
         socket = self.request[1]
-        print("{} wrote:".format(self.client_address[0]))
-        print(data)
+        address = self.client_address[0]
+        print(f'{now} => {address}: {data}')
         socket.sendto(data.upper(), self.client_address)
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 1234
     with socketserver.UDPServer((HOST, PORT), MyUDPHandler) as server:
+        print(f'Listening to port {HOST}:{PORT}')
         server.serve_forever()
